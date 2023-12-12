@@ -1,0 +1,36 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Policyholder {
+  code             Int      @id @default(autoincrement())
+  name             String
+  registrationDate DateTime
+  path             String
+  depth            Int
+
+  introducerCode       Int?
+  parentIntroducerCode Int?
+  leftIntroducedCode   Int? @unique
+  rightIntroducedCode  Int? @unique
+
+  introducedBy     Policyholder? @relation("PolicyholderToIntroducer", fields: [introducerCode], references: [code])
+  parentIntroduced Policyholder? @relation("PolicyholderToParent", fields: [parentIntroducerCode], references: [code])
+  leftIntroduced   Policyholder? @relation("PolicyholderToLeft", fields: [leftIntroducedCode], references: [code])
+  rightIntroduced  Policyholder? @relation("PolicyholderToRight", fields: [rightIntroducedCode], references: [code])
+
+  introductions Policyholder[] @relation("PolicyholderToIntroducer")
+  nextLayer     Policyholder[] @relation("PolicyholderToParent")
+  left          Policyholder?  @relation("PolicyholderToLeft")
+  right         Policyholder?  @relation("PolicyholderToRight")
+
+  @@index([leftIntroducedCode, rightIntroducedCode])
+}
