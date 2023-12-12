@@ -29,6 +29,7 @@ class PolicyHolderController {
       });
       return;
     }
+    const realCode = padDigits(targetCode, 10);
 
     try {
       const policyholderResp = await prismaClient.policyholder.findUnique({
@@ -37,7 +38,7 @@ class PolicyHolderController {
 
       if (isEmpty(policyholderResp) || policyholderResp === null) {
         res.status(404).send({
-          message: `${targetCode} doesn't exist`,
+          message: `${realCode} doesn't exist`,
           result: null,
         });
         return;
@@ -88,6 +89,7 @@ class PolicyHolderController {
       });
       return;
     }
+    const realCode = padDigits(targetCode, 10);
 
     try {
       const policyholder = await prismaClient.policyholder.findUnique({
@@ -96,14 +98,14 @@ class PolicyHolderController {
 
       if (isEmpty(policyholder) || policyholder === null) {
         res.status(404).send({
-          message: `${targetCode} doesn't exist`,
+          message: `${realCode} doesn't exist`,
           result: null,
         });
         return;
       }
       if (!policyholder.parentIntroducerCode) {
         res.status(404).send({
-          message: `${targetCode} is the top of full structure`,
+          message: `${realCode} is the top of full structure`,
           result: null,
         });
         return;
@@ -115,10 +117,7 @@ class PolicyHolderController {
 
       if (isEmpty(parentPolicyHolder) || parentPolicyHolder === null) {
         res.status(404).send({
-          message: `top PolicyHolder ${padDigits(
-            policyholder.parentIntroducerCode,
-            10
-          )} doesn't exist`,
+          message: `top PolicyHolder ${realCode} doesn't exist`,
           result: null,
         });
         return;
